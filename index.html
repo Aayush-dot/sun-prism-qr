@@ -95,6 +95,8 @@ main{padding:0 16px}
 .acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
 .act{border:none;border-radius:12px;padding:10px;font-weight:600;font-size:13.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
 .act.p{background:var(--orange);color:#fff}
+a.act{text-decoration:none}
+.dir{margin-top:12px;width:100%}
 .act.s{background:var(--peach2);color:var(--burnt)}
 .note{font-size:12.5px;color:var(--muted);background:var(--peach2);border-radius:12px;padding:10px 12px}
 
@@ -135,7 +137,9 @@ main{padding:0 16px}
 .sticky .in{max-width:520px;margin:0 auto;display:flex;align-items:center;gap:12px}
 .sticky .t{font-size:12px;color:var(--muted);line-height:1.3}
 .sticky .t b{display:block;color:var(--ink);font-size:14px}
-.sticky .act{margin-left:auto;padding:11px 18px}
+.sticky .act{margin-left:auto;padding:11px 18px;flex:none;white-space:nowrap}
+.sticky .t{min-width:0}
+.sticky .t b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 footer{font-size:11.5px;color:var(--muted);text-align:center;padding:26px 20px 10px;line-height:1.5}
 .toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translate(-50%,10px);background:#2B2B2B;color:#fff;font-size:13px;padding:10px 14px;border-radius:12px;max-width:88%;opacity:0;transition:.25s;pointer-events:none;z-index:20;text-align:center}
@@ -170,7 +174,6 @@ footer{font-size:11.5px;color:var(--muted);text-align:center;padding:26px 20px 1
       <div class="v" id="recName">Photostable</div>
       <div class="why" id="recWhy">Choose your product below</div>
     </div>
-    <button class="change" id="changeBtn" type="button">Change</button>
   </div>
 
   <main>
@@ -227,8 +230,7 @@ footer{font-size:11.5px;color:var(--muted);text-align:center;padding:26px 20px 1
           <div class="dot" id="rdot" style="left:40%"></div><div class="lbl" id="rlbl" style="left:40%"><b>Day 12</b> reminder</div>
         </div>
         <div class="sms" id="sms"><small>SMS preview</small>Photostable: your 20 g tube may be running low. Find it near you: ps.link/agra. Reply STOP to opt out.</div>
-        <button class="cta" id="remind" type="button">Remind me to refill</button>
-        <div class="fine">Opt-in only, with clear consent. In this demo, no data is collected.</div>
+        <div class="fine">Opt in at the chemist or by replying YES to the welcome SMS. Stop anytime.</div>
       </div>
     </div>
   </main>
@@ -238,8 +240,7 @@ footer{font-size:11.5px;color:var(--muted);text-align:center;padding:26px 20px 1
 
 <div class="sticky"><div class="in">
   <div class="t" id="stT">Nearest chemist<b>–</b></div>
-  <button class="act p" id="stCall" type="button">
-    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg>Call</button>
+  <a class="act p" id="stDir" target="_blank" rel="noopener">Directions</a>
 </div></div>
 <div class="toast" id="toast" role="status"></div>
 
@@ -288,6 +289,7 @@ function hav(a,b){const R=6371,t=x=>x*Math.PI/180,dl=t(b[0]-a[0]),dn=t(b[1]-a[1]
 function fmt(km){return km<1?Math.round(km*1000/10)*10+" m":km.toFixed(1)+" km";}
 function walk(km){const m=Math.max(1,Math.round(km/4.5*60));return m<=25?m+" min walk":Math.round(km/20*60+3)+" min drive";}
 function openNow(){const d=new Date(),m=d.getHours()*60+d.getMinutes();return m>=HOURS[0][0]*60&&m<HOURS[1][0]*60;}
+function dirUrl(ll){return "https://www.google.com/maps/dir/?api=1&destination="+ll[0].toFixed(6)+","+ll[1].toFixed(6);}
 function toast(t){const e=$("toast");e.textContent=t;e.classList.add("show");clearTimeout(toast.h);toast.h=setTimeout(()=>e.classList.remove("show"),2800);}
 
 function buildShops(){
@@ -313,7 +315,6 @@ function renderRec(){
   img.onerror=()=>{img.hidden=true;tube.style.display="";};
   img.alt=s?s.full+" pack":"Photostable pack";
   img.src="assets/photostable-"+(id==="entry"?"gold":id)+".png";
-  $("changeBtn").textContent=s?"Change":"Pick";
 }
 function renderFilters(){
   const f=$("filters");f.innerHTML="";
@@ -331,7 +332,7 @@ function renderList(){
   const open=openNow();
   list.forEach((sh,i)=>{
     const d=document.createElement("div");d.className="shop"+(i===0?" best":"");
-    d.innerHTML='<div class="top"><div class="badge"></div><div><div class="nm"></div><div class="ad"></div></div><div class="dist"><b></b><small></small></div></div><div class="tagrow"></div><div class="acts"><button class="act p" type="button">Call</button><button class="act s" type="button">Directions</button></div>';
+    d.innerHTML='<div class="top"><div class="badge"></div><div><div class="nm"></div><div class="ad"></div></div><div class="dist"><b></b><small></small></div></div><div class="tagrow"></div><a class="act p dir" target="_blank" rel="noopener">Get directions</a>';
     d.querySelector(".badge").textContent=i+1;
     d.querySelector(".nm").textContent=sh.n;
     d.querySelector(".ad").textContent=sh.a;
@@ -342,15 +343,13 @@ function renderList(){
     if(i===0)add("best","Closest");
     add(open?"open":"no",open?"Open now · till 10 pm":"Opens 9 am");
     SKUS.forEach(x=>add((sh.s.includes(x.id)?"ok":"no")+(x.id===sku?" hl":""),(sh.s.includes(x.id)?"✓ ":"")+x.name));
-    const [c,r]=d.querySelectorAll(".act");
-    c.onclick=()=>toast("Demo: in the pilot this calls "+sh.n.replace("Demo ","the ")+" directly.");
-    r.onclick=()=>toast("Demo: in the pilot this opens Google Maps directions.");
+    d.querySelector(".dir").href=dirUrl(sh.ll);
     L.appendChild(d);
   });
   const best=list[0];
   $("stT").innerHTML="";$("stT").append("Nearest with "+(s?s.name:"Photostable"));
   const b=document.createElement("b");b.textContent=best?best.n+" · "+fmt(best.km):"None nearby";$("stT").appendChild(b);
-  $("stCall").onclick=()=>toast(best?"Demo: in the pilot this calls "+best.n.replace("Demo ","the ")+".":"Try another area.");
+  if(best)$("stDir").href=dirUrl(best.ll);
   return list;
 }
 let map,layer;
@@ -384,7 +383,6 @@ function update(rebuild){
 }
 
 /* location: demo uses a fixed "you are here" point next to the doctor's clinic (no permission prompt) */
-$("changeBtn").onclick=()=>{$("filters").scrollIntoView({behavior:"smooth",block:"center"});};
 
 /* reminder */
 let pack="20";
@@ -399,7 +397,6 @@ function setPack(p){
   $("sms").append("Photostable: your "+p+" g tube may be running low. Find it near you: ps.link/"+slug+". Reply STOP to opt out.");
 }
 document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>setPack(b.dataset.p));
-$("remind").onclick=()=>toast("Demo: in the pilot this opens a consent form (DPDP-compliant). Nothing is collected here.");
 
 update(true);
 </script>
