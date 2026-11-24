@@ -36,6 +36,10 @@ button{font:inherit}
 /* floating rec card */
 .rec{background:var(--card);border-radius:18px;box-shadow:var(--shadow);margin:-52px 16px 0;padding:14px 16px;position:relative;z-index:2;display:flex;gap:12px;align-items:center}
 .tube{width:44px;height:64px;flex:none}
+.pack{width:64px;height:86px;flex:none;object-fit:contain;border-radius:10px;background:#fff}
+.locline{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);background:var(--card);border-radius:99px;box-shadow:var(--shadow);padding:8px 14px;width:fit-content;max-width:100%}
+.locline b{color:var(--ink);font-weight:600}
+.locline .dot{width:8px;height:8px;flex:none;border-radius:50%;background:#1A73E8;box-shadow:0 0 0 4px rgba(26,115,232,.18)}
 .rec .k{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .rec .v{font-weight:700;font-size:17px;color:var(--burnt);line-height:1.25}
 .rec .why{font-size:13px;color:var(--muted)}
@@ -58,7 +62,7 @@ main{padding:0 16px}
 .areas button{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:6px 12px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;color:var(--ink)}
 .areas button[aria-pressed="true"]{border-color:var(--orange);color:var(--burnt);background:var(--peach2);font-weight:600}
 
-#map{height:210px;border-radius:16px;margin-top:12px;box-shadow:var(--shadow);background:#EFE7E0;z-index:0}
+#map{height:180px;border-radius:16px;margin-top:12px;box-shadow:var(--shadow);background:#EFE7E0;z-index:0}
 .leaflet-container{font:inherit}
 .mk{width:28px;height:28px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--orange);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.25);display:grid;place-items:center}
 .mk span{transform:rotate(45deg);color:#fff;font-size:12px;font-weight:700}
@@ -152,7 +156,8 @@ footer{font-size:11.5px;color:var(--muted);text-align:center;padding:26px 20px 1
 
 <div class="wrap">
   <div class="rec" id="rec">
-    <svg class="tube" viewBox="0 0 44 64" aria-hidden="true">
+    <img class="pack" id="packImg" alt="" hidden>
+    <svg class="tube" id="tubeSvg" viewBox="0 0 44 64" aria-hidden="true">
       <rect x="10" y="0" width="24" height="8" rx="2" fill="#C55A11"/>
       <path d="M8 8h28l-2 52a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4z" fill="#fff" stroke="#F0D5C2" stroke-width="1.5"/>
       <rect id="tubeband" x="9" y="22" width="26" height="16" fill="#F68B1F"/>
@@ -169,12 +174,7 @@ footer{font-size:11.5px;color:var(--muted);text-align:center;padding:26px 20px 1
   <main>
     <div class="sec">
       <h2><span class="num">1</span>Chemists near you</h2>
-      <div class="loc">
-        <div class="pin" id="pin"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="#C55A11" d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg></div>
-        <div><div class="t" id="locT">Use your location</div><div class="s" id="locS">See the closest chemists with your product</div></div>
-        <button class="locbtn" id="locBtn" type="button">Locate me</button>
-      </div>
-      <div class="areas" id="areas" role="group" aria-label="Or pick a pilot area"></div>
+      <div class="locline"><span class="dot"></span><span><b>Using your current location</b> · sorted by distance</span></div>
       <div id="map" aria-label="Map of nearby chemists"></div>
 
       <div class="filters" id="filters" role="group" aria-label="Filter by product"></div>
@@ -277,7 +277,7 @@ const $=id=>document.getElementById(id);
 const P=new URLSearchParams(location.search);
 let sku=SKUS.some(s=>s.id===P.get("sku"))?P.get("sku"):"all";
 let area=AREAS[P.get("area")]?P.get("area"):"delhi";
-let me=null;           // [lat,lng] if located
+let me=null;           // demo "you are here" point, set in buildShops
 let nearMe=false;      // demo chemists generated around the user
 let shops=[];
 
@@ -293,7 +293,7 @@ function buildShops(){
     const spots=[[.12,.08,["gold","acne","pro","emulgel","entry"],"Clinic-side chemist"],[-.35,.3,["gold","acne","pro","entry"],"Neighbourhood pharmacy"],[.7,-.45,["gold","acne","emulgel"],"Market pharmacy"],[-1.1,-.9,["gold","pro","emulgel","entry"],"Main road pharmacy"]];
     shops=spots.map((s,i)=>({n:"Demo Chemist "+String.fromCharCode(65+i),a:s[3]+" (placed near you)",ll:off(me,s[0],s[1]),s:s[2]}));
   }else{
-    const A=AREAS[area];
+    const A=AREAS[area]; me=off(A.c,-.08,-.06);
     shops=A.shops.map(s=>({n:s[0],a:s[1],ll:off(A.c,s[2],s[3]),s:s[4]}));
   }
   const ref=me&&(nearMe||hav(me,AREAS[area].c)<40)?me:AREAS[area].c;
@@ -306,6 +306,11 @@ function renderRec(){
   $("recName").textContent=s?s.full:"Photostable";
   $("recWhy").textContent=s?s.why:"Pick your product to filter chemists";
   $("tubeband").setAttribute("fill",s?s.col:"#F68B1F");
+  const img=$("packImg"),tube=$("tubeSvg"),id=s?s.id:"gold";
+  img.onload=()=>{img.hidden=false;tube.style.display="none";};
+  img.onerror=()=>{img.hidden=true;tube.style.display="";};
+  img.alt=s?s.full+" pack":"Photostable pack";
+  img.src="assets/photostable-"+(id==="entry"?"gold":id)+".png";
   $("changeBtn").textContent=s?"Change":"Pick";
 }
 function renderFilters(){
@@ -314,16 +319,11 @@ function renderFilters(){
     const b=document.createElement("button");b.type="button";b.textContent=x.name;b.setAttribute("aria-pressed",x.id===sku);
     b.onclick=()=>{sku=x.id;update();};f.appendChild(b);
   });
-  const a=$("areas");a.innerHTML="";
-  Object.entries(AREAS).forEach(([k,v])=>{
-    const b=document.createElement("button");b.type="button";b.textContent=v.label;b.setAttribute("aria-pressed",!nearMe&&k===area);
-    b.onclick=()=>{area=k;nearMe=false;update(true);};a.appendChild(b);
-  });
 }
 function renderList(){
   const L=$("list");L.innerHTML="";
   const list=shops.filter(s=>sku==="all"||s.s.includes(sku));
-  const where=nearMe?"near you":"in "+AREAS[area].label;
+  const where="near you";
   const s=SKUS.find(x=>x.id===sku);
   $("count").textContent=list.length+" chemist"+(list.length===1?"":"s")+" "+where+" usually stock "+(s?s.full:"Photostable");
   const open=openNow();
@@ -381,22 +381,8 @@ function update(rebuild){
   history.replaceState(null,"","?"+np.toString());
 }
 
-/* location */
-function setLoc(t,s,live){$("locT").textContent=t;$("locS").textContent=s;$("pin").classList.toggle("live",!!live);}
-function locate(){
-  if(!navigator.geolocation){setLoc("Location not available","Pick an area below");return;}
-  setLoc("Finding you…","Allow location access when asked",true);
-  navigator.geolocation.getCurrentPosition(p=>{
-    me=[p.coords.latitude,p.coords.longitude];
-    let best=null,bd=1e9;Object.entries(AREAS).forEach(([k,v])=>{const d=hav(me,v.c);if(d<bd){bd=d;best=k;}});
-    if(bd<40){area=best;nearMe=false;setLoc("Located in "+AREAS[best].label,"Sorted by distance from you",false);}
-    else{nearMe=true;setLoc("Located: outside the pilot areas","Demo chemists placed near you to show how it works",false);}
-    $("locBtn").textContent="Refresh";update(true);
-  },()=>{setLoc("Location not shared","Pick a pilot area below",false);},{enableHighAccuracy:true,timeout:9000,maximumAge:60000});
-}
-$("locBtn").onclick=locate;
+/* location: demo uses a fixed "you are here" point next to the doctor's clinic (no permission prompt) */
 $("changeBtn").onclick=()=>{$("filters").scrollIntoView({behavior:"smooth",block:"center"});};
-if(navigator.permissions&&navigator.permissions.query){navigator.permissions.query({name:"geolocation"}).then(r=>{if(r.state==="granted")locate();}).catch(()=>{});}
 
 /* reminder */
 let pack="20";

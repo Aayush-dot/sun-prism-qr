@@ -1,13 +1,15 @@
 # Photostable "Find it near you" (concept demo)
 
-Concept demo for Sun Pharma's Sun Prism Season 2 case competition (Team Rajma Chawal, SPJIMR). Not an official Sun Pharma page; all chemist data is illustrative.
+Concept demo for Sun Pharma's Sun Prism Season 2 case competition (Team Rajma Chawal, SPJIMR). Chemist data is illustrative.
 
 ## Deploy on GitHub Pages
-1. Create a public repository and upload `index.html` and the `assets` folder (keep the folder structure).
+1. Upload `index.html` and the `assets` folder to the repository root (keep the folder).
 2. Settings → Pages → Deploy from a branch → `main` / root → Save.
-3. Live at `https://<username>.github.io/<repo>/` in about a minute.
 
 ## Links for QR codes
-- `?area=agra&sku=acne` opens Agra with Photostable Acne selected.
-- Areas: `delhi`, `agra`, `punjab`. Products: `gold`, `acne`, `pro`, `emulgel`, `entry`.
-- "Locate me" sorts by real distance; outside the pilot areas it places demo chemists near the viewer.
+- `?area=agra&sku=gold` → Agra chemists, Photostable Gold.
+- area: `delhi`, `agra`, `punjab` · sku: `gold`, `acne`, `pro`, `emulgel`, `entry`.
+
+## Pack photos
+- `assets/photostable-gold.png` is used for Gold (and the 20 g pack).
+- To show photos for the others, add `assets/photostable-acne.png`, `assets/photostable-pro.png`, `assets/photostable-emulgel.png`. Until then those show a drawn tube.
