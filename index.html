@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F68B1F">
+<meta name="robots" content="noindex">
+<title>Photostable Near You (Concept Demo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+:root{
+  --orange:#F68B1F; --orange2:#FF9F3F; --burnt:#C55A11; --peach:#FCE4D6; --peach2:#FFF4EC; --handbg:#FEE0D1;
+  --ink:#1F2328; --muted:#636A72; --line:#EEE6DF; --bg:#FAF6F2; --card:#FFFFFF; --green:#1F8A4C; --greenbg:#E6F4EC;
+  --shadow:0 6px 20px rgba(197,90,17,.10), 0 1px 3px rgba(0,0,0,.05);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 "Poppins",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+button{font:inherit}
+.wrap{max-width:520px;margin:0 auto}
+.demo{background:#2B2B2B;color:#fff;font-size:11px;text-align:center;padding:6px 14px;line-height:1.4}
+
+/* hero */
+.hero{background:linear-gradient(135deg,var(--orange) 0%,var(--orange2) 60%,#FFB566 100%);color:#fff;padding:18px 16px 70px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.35),rgba(255,255,255,0) 70%)}
+.brandrow{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1}
+.brand{font-weight:800;font-size:22px;letter-spacing:-.3px}
+.brand small{display:block;font-weight:500;font-size:12px;opacity:.9;letter-spacing:0}
+.sun{width:38px;height:38px}
+.hero h1{font-size:24px;line-height:1.2;margin:18px 0 4px;font-weight:700;position:relative;z-index:1}
+.hero p{margin:0;font-size:14px;opacity:.95;position:relative;z-index:1}
+
+/* floating rec card */
+.rec{background:var(--card);border-radius:18px;box-shadow:var(--shadow);margin:-52px 16px 0;padding:14px 16px;position:relative;z-index:2;display:flex;gap:12px;align-items:center}
+.tube{width:44px;height:64px;flex:none}
+.rec .k{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.rec .v{font-weight:700;font-size:17px;color:var(--burnt);line-height:1.25}
+.rec .why{font-size:13px;color:var(--muted)}
+.rec .change{margin-left:auto;align-self:flex-start;border:none;background:var(--peach2);color:var(--burnt);font-size:12px;font-weight:600;border-radius:99px;padding:5px 10px;cursor:pointer}
+
+main{padding:0 16px}
+.sec{margin-top:22px}
+.sec h2{font-size:17px;margin:0 0 10px;font-weight:700;display:flex;align-items:center;gap:8px}
+.sec h2 .num{width:24px;height:24px;border-radius:50%;background:var(--orange);color:#fff;font-size:12px;display:inline-grid;place-items:center}
+
+/* location */
+.loc{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:14px;display:flex;gap:12px;align-items:center}
+.pin{width:40px;height:40px;border-radius:50%;background:var(--peach);display:grid;place-items:center;flex:none;position:relative}
+.pin.live::before{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid var(--orange);animation:pulse 1.6s ease-out infinite}
+@keyframes pulse{from{transform:scale(1);opacity:.9}to{transform:scale(1.7);opacity:0}}
+.loc .t{font-weight:600;font-size:14px}
+.loc .s{font-size:12.5px;color:var(--muted)}
+.locbtn{margin-left:auto;border:none;background:var(--orange);color:#fff;font-weight:600;font-size:13px;border-radius:99px;padding:9px 14px;cursor:pointer;white-space:nowrap}
+.areas{display:flex;gap:8px;margin-top:10px;overflow-x:auto;padding-bottom:2px}
+.areas button{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:6px 12px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;color:var(--ink)}
+.areas button[aria-pressed="true"]{border-color:var(--orange);color:var(--burnt);background:var(--peach2);font-weight:600}
+
+#map{height:210px;border-radius:16px;margin-top:12px;box-shadow:var(--shadow);background:#EFE7E0;z-index:0}
+.leaflet-container{font:inherit}
+.mk{width:28px;height:28px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--orange);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.25);display:grid;place-items:center}
+.mk span{transform:rotate(45deg);color:#fff;font-size:12px;font-weight:700}
+.me{width:16px;height:16px;border-radius:50%;background:#1A73E8;border:3px solid #fff;box-shadow:0 0 0 6px rgba(26,115,232,.2)}
+
+.filters{display:flex;gap:8px;overflow-x:auto;margin:14px -16px 0;padding:0 16px 4px;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.filters button{flex:none;border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;color:var(--ink)}
+.filters button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+
+.count{font-size:13px;color:var(--muted);margin:12px 0 8px}
+.shop{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:14px;margin-bottom:12px;border:2px solid transparent}
+.shop.best{border-color:var(--orange)}
+.shop .top{display:flex;gap:10px;align-items:flex-start}
+.badge{width:30px;height:30px;border-radius:10px;background:var(--peach);color:var(--burnt);font-weight:700;font-size:14px;display:grid;place-items:center;flex:none}
+.shop .nm{font-weight:600;line-height:1.3}
+.shop .ad{font-size:13px;color:var(--muted)}
+.shop .dist{margin-left:auto;text-align:right;flex:none}
+.shop .dist b{display:block;color:var(--burnt);font-size:15px}
+.shop .dist small{font-size:11px;color:var(--muted)}
+.tagrow{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 0}
+.chip{font-size:11.5px;padding:3px 9px;border-radius:99px;font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.chip.ok{background:var(--greenbg);color:var(--green)}
+.chip.no{background:#F2F2F2;color:#A3A3A3;text-decoration:line-through;font-weight:500}
+.chip.open{background:var(--greenbg);color:var(--green)}
+.chip.best{background:var(--orange);color:#fff}
+.chip.hl{outline:2px solid var(--green);outline-offset:1px}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.act{border:none;border-radius:12px;padding:10px;font-weight:600;font-size:13.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.act.p{background:var(--orange);color:#fff}
+.act.s{background:var(--peach2);color:var(--burnt)}
+.note{font-size:12.5px;color:var(--muted);background:var(--peach2);border-radius:12px;padding:10px 12px}
+
+/* online */
+.online{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.online a{background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:14px 6px;text-align:center;text-decoration:none;color:var(--ink);font-weight:600;font-size:13px}
+.online a span{display:block;font-size:11px;font-weight:500;color:var(--muted)}
+
+/* dose */
+.dose{background:var(--card);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+.dose .hand{background:var(--handbg);padding:16px 16px 10px;text-align:center}
+.dose .hand img{width:100%;max-width:300px;height:auto;display:block;margin:0 auto}
+.dose .hand .cap{font-weight:700;color:var(--burnt);font-size:18px;margin-top:6px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--line)}
+.step{padding:14px 10px;text-align:center;border-right:1px solid var(--line)}
+.step:last-child{border-right:none}
+.step svg{width:54px;height:54px;display:block;margin:0 auto 6px}
+.step b{display:block;font-size:13px}
+.step span{font-size:11.5px;color:var(--muted);line-height:1.35;display:block}
+
+/* reminder */
+.rem{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:16px}
+.seg{display:inline-flex;background:var(--peach2);border-radius:99px;padding:4px}
+.seg button{border:none;background:none;border-radius:99px;padding:6px 16px;font-weight:600;font-size:13px;color:var(--burnt);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--orange);color:#fff}
+.tl{position:relative;margin:22px 4px 8px;height:44px}
+.tl .bar{position:absolute;left:0;right:0;top:10px;height:6px;border-radius:6px;background:linear-gradient(90deg,var(--peach),var(--orange))}
+.tl .dot{position:absolute;top:4px;width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--orange);transform:translateX(-50%);transition:left .35s}
+.tl .lbl{position:absolute;top:26px;font-size:11.5px;color:var(--muted);transform:translateX(-50%);white-space:nowrap;transition:left .35s}
+.tl .lbl b{color:var(--burnt)}
+.sms{background:#F1F3F4;border-radius:16px 16px 16px 4px;padding:10px 12px;font-size:13px;margin:12px 0;max-width:92%}
+.sms small{display:block;color:var(--muted);font-size:11px;margin-bottom:2px}
+.cta{width:100%;border:none;background:var(--orange);color:#fff;font-weight:700;font-size:15px;border-radius:14px;padding:13px;cursor:pointer}
+.fine{font-size:11.5px;color:var(--muted);text-align:center;margin-top:8px}
+
+/* sticky */
+.sticky{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom));z-index:10}
+.sticky .in{max-width:520px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.sticky .t{font-size:12px;color:var(--muted);line-height:1.3}
+.sticky .t b{display:block;color:var(--ink);font-size:14px}
+.sticky .act{margin-left:auto;padding:11px 18px}
+
+footer{font-size:11.5px;color:var(--muted);text-align:center;padding:26px 20px 10px;line-height:1.5}
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translate(-50%,10px);background:#2B2B2B;color:#fff;font-size:13px;padding:10px 14px;border-radius:12px;max-width:88%;opacity:0;transition:.25s;pointer-events:none;z-index:20;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div class="demo">Concept demo · Sun Prism case competition · Team Rajma Chawal, SPJIMR · Not an official Sun Pharma page · Illustrative data</div>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="brandrow">
+      <div class="brand">Photostable<small>Your sun-protection plan</small></div>
+      <svg class="sun" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="8" fill="#fff"/><g stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M20 3v5M20 32v5M3 20h5M32 20h5M8 8l3.5 3.5M28.5 28.5L32 32M8 32l3.5-3.5M28.5 11.5L32 8"/></g></svg>
+    </div>
+    <h1>Find it in stock<br>near you</h1>
+    <p>The exact product your doctor recommended, at a chemist close by.</p>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="rec" id="rec">
+    <svg class="tube" viewBox="0 0 44 64" aria-hidden="true">
+      <rect x="10" y="0" width="24" height="8" rx="2" fill="#C55A11"/>
+      <path d="M8 8h28l-2 52a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4z" fill="#fff" stroke="#F0D5C2" stroke-width="1.5"/>
+      <rect id="tubeband" x="9" y="22" width="26" height="16" fill="#F68B1F"/>
+      <rect x="12" y="44" width="20" height="2.5" rx="1" fill="#F0D5C2"/><rect x="12" y="49" width="14" height="2.5" rx="1" fill="#F0D5C2"/>
+    </svg>
+    <div>
+      <div class="k">Your doctor recommended</div>
+      <div class="v" id="recName">Photostable</div>
+      <div class="why" id="recWhy">Choose your product below</div>
+    </div>
+    <button class="change" id="changeBtn" type="button">Change</button>
+  </div>
+
+  <main>
+    <div class="sec">
+      <h2><span class="num">1</span>Chemists near you</h2>
+      <div class="loc">
+        <div class="pin" id="pin"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="#C55A11" d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg></div>
+        <div><div class="t" id="locT">Use your location</div><div class="s" id="locS">See the closest chemists with your product</div></div>
+        <button class="locbtn" id="locBtn" type="button">Locate me</button>
+      </div>
+      <div class="areas" id="areas" role="group" aria-label="Or pick a pilot area"></div>
+      <div id="map" aria-label="Map of nearby chemists"></div>
+
+      <div class="filters" id="filters" role="group" aria-label="Filter by product"></div>
+      <div class="count" id="count"></div>
+      <div id="list"></div>
+      <div class="note">Stock shows what each chemist <b>usually</b> carries, refreshed weekly from distributor data. Call before you go; any chemist can also order it for you within a day.</div>
+    </div>
+
+    <div class="sec">
+      <h2><span class="num">2</span>Or order online</h2>
+      <div class="online" id="online"></div>
+    </div>
+
+    <div class="sec">
+      <h2><span class="num">3</span>Use the right amount</h2>
+      <div class="dose">
+        <div class="hand">
+          <img src="assets/hand.png" alt="A line of sunscreen along the index and middle finger" width="780" height="280">
+          <div class="cap">Two fingers = face + neck</div>
+        </div>
+        <div class="steps">
+          <div class="step">
+            <svg viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="26" fill="#FFF4EC"/><rect x="11" y="20" width="32" height="7" rx="3.5" fill="#F5D3B8" stroke="#C55A11" stroke-width="1.5"/><rect x="11" y="29" width="32" height="7" rx="3.5" fill="#F5D3B8" stroke="#C55A11" stroke-width="1.5"/><rect x="21" y="22" width="19" height="3" rx="1.5" fill="#fff"/><rect x="21" y="31" width="19" height="3" rx="1.5" fill="#fff"/></svg>
+            <b>Squeeze</b><span>A line along two fingers</span>
+          </div>
+          <div class="step">
+            <svg viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="26" fill="#FFF4EC"/><ellipse cx="27" cy="24" rx="12" ry="14" fill="#F8DCC6" stroke="#C55A11" stroke-width="1.5"/><path d="M21 38c0 4 3 7 6 7s6-3 6-7" fill="#F8DCC6" stroke="#C55A11" stroke-width="1.5"/><g fill="#fff" stroke="#E7A57A" stroke-width=".8"><circle cx="27" cy="14" r="2.3"/><circle cx="20" cy="25" r="2.3"/><circle cx="34" cy="25" r="2.3"/><circle cx="27" cy="25" r="2"/><circle cx="27" cy="33" r="2"/><circle cx="27" cy="42" r="2.3"/></g></svg>
+            <b>Dot &amp; spread</b><span>Forehead, cheeks, nose, chin, neck</span>
+          </div>
+          <div class="step">
+            <svg viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="26" fill="#FFF4EC"/><circle cx="27" cy="27" r="13" fill="#fff" stroke="#C55A11" stroke-width="1.8"/><path d="M27 19v8l5 3" stroke="#F68B1F" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M40 14a18 18 0 0 1 2 6" stroke="#F68B1F" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M42 20l-3-1M42 20l1-3" stroke="#F68B1F" stroke-width="2" stroke-linecap="round"/></svg>
+            <b>Reapply</b><span>Every 2–3 hours outdoors</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <h2><span class="num">4</span>Never run out</h2>
+      <div class="rem">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+          <div style="font-size:13.5px;font-weight:600">Which pack did you buy?</div>
+          <div class="seg" role="group" aria-label="Pack size"><button type="button" data-p="20" aria-pressed="true">20 g</button><button type="button" data-p="50" aria-pressed="false">50 g</button></div>
+        </div>
+        <div class="tl" aria-hidden="true">
+          <div class="bar"></div>
+          <div class="dot" style="left:0"></div><div class="lbl" style="left:4%"><b>Day 0</b> buy</div>
+          <div class="dot" id="rdot" style="left:40%"></div><div class="lbl" id="rlbl" style="left:40%"><b>Day 12</b> reminder</div>
+        </div>
+        <div class="sms" id="sms"><small>SMS preview</small>Photostable: your 20 g tube may be running low. Find it near you: ps.link/agra. Reply STOP to opt out.</div>
+        <button class="cta" id="remind" type="button">Remind me to refill</button>
+        <div class="fine">Opt-in only, with clear consent. In this demo, no data is collected.</div>
+      </div>
+    </div>
+  </main>
+
+  <footer>Concept demo by Team Rajma Chawal (SPJIMR) for Sun Pharma's Sun Prism Season 2 case competition. Chemist names, locations, hours and stock are illustrative. Photostable is a brand of Sun Pharmaceutical Industries Ltd.</footer>
+</div>
+
+<div class="sticky"><div class="in">
+  <div class="t" id="stT">Nearest chemist<b>–</b></div>
+  <button class="act p" id="stCall" type="button">
+    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg>Call</button>
+</div></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+const SKUS=[
+  {id:"gold",name:"Gold",full:"Photostable Gold",why:"For pigmentation & melasma",col:"#E0A100"},
+  {id:"acne",name:"Acne",full:"Photostable Acne",why:"For oily & acne-prone skin",col:"#2E9E8F"},
+  {id:"pro",name:"Pro+",full:"Photostable Pro+",why:"For outdoors & high sun exposure",col:"#D9480F"},
+  {id:"emulgel",name:"Emulgel",full:"Photostable Emulgel",why:"For sensitive skin & after procedures",col:"#7A6FD0"},
+  {id:"entry",name:"20 g pack",full:"Photostable 20 g pack",why:"The smaller starter pack",col:"#F68B1F"}
+];
+// Pilot clusters (illustrative chemists placed around each centre; offsets in km east/north)
+const AREAS={
+  delhi:{label:"Delhi NCR",c:[28.6519,77.1909],slug:"delhi",shops:[
+    ["Demo Chemist 1","Karol Bagh, next to skin clinic",.15,.1,["gold","acne","pro","emulgel","entry"]],
+    ["Demo Chemist 2","Pusa Road",-.5,.35,["gold","acne","pro","emulgel"]],
+    ["Demo Chemist 3","Patel Nagar",-1.1,.6,["gold","acne","emulgel","entry"]],
+    ["Demo Chemist 4","Rajendra Place",.9,-.8,["gold","acne"]]]},
+  agra:{label:"Agra",c:[27.1991,78.0055],slug:"agra",shops:[
+    ["Demo Chemist 5","Sanjay Place, near clinic",.1,.05,["gold","acne","pro","emulgel","entry"]],
+    ["Demo Chemist 6","Hari Parwat",.6,-.4,["gold","acne","pro","entry"]],
+    ["Demo Chemist 7","Civil Lines",-.9,.8,["gold","emulgel"]]]},
+  punjab:{label:"Punjab (Batala)",c:[31.8186,75.2028],slug:"batala",shops:[
+    ["Demo Chemist 8","Near civil hospital",.2,.15,["gold","acne","pro","emulgel","entry"]],
+    ["Demo Chemist 9","Main bazaar",-.6,.4,["gold","acne","entry"]],
+    ["Demo Chemist 10","Gurdaspur Road",1.4,1.1,["gold","pro","emulgel"]]]}
+};
+const ONLINE=[
+  {n:"Tata 1mg",u:q=>"https://www.1mg.com/search/all?name="+q},
+  {n:"PharmEasy",u:q=>"https://pharmeasy.in/search/all?name="+q},
+  {n:"Apollo",u:q=>"https://www.apollopharmacy.in/search-medicines/"+q}
+];
+const HOURS=[[9,0],[22,0]];
+
+const $=id=>document.getElementById(id);
+const P=new URLSearchParams(location.search);
+let sku=SKUS.some(s=>s.id===P.get("sku"))?P.get("sku"):"all";
+let area=AREAS[P.get("area")]?P.get("area"):"delhi";
+let me=null;           // [lat,lng] if located
+let nearMe=false;      // demo chemists generated around the user
+let shops=[];
+
+function off(c,ekm,nkm){return [c[0]+nkm/110.574, c[1]+ekm/(111.32*Math.cos(c[0]*Math.PI/180))];}
+function hav(a,b){const R=6371,t=x=>x*Math.PI/180,dl=t(b[0]-a[0]),dn=t(b[1]-a[1]);const h=Math.sin(dl/2)**2+Math.cos(t(a[0]))*Math.cos(t(b[0]))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h));}
+function fmt(km){return km<1?Math.round(km*1000/10)*10+" m":km.toFixed(1)+" km";}
+function walk(km){const m=Math.max(1,Math.round(km/4.5*60));return m<=25?m+" min walk":Math.round(km/20*60+3)+" min drive";}
+function openNow(){const d=new Date(),m=d.getHours()*60+d.getMinutes();return m>=HOURS[0][0]*60&&m<HOURS[1][0]*60;}
+function toast(t){const e=$("toast");e.textContent=t;e.classList.add("show");clearTimeout(toast.h);toast.h=setTimeout(()=>e.classList.remove("show"),2800);}
+
+function buildShops(){
+  if(nearMe&&me){
+    const spots=[[.12,.08,["gold","acne","pro","emulgel","entry"],"Clinic-side chemist"],[-.35,.3,["gold","acne","pro","entry"],"Neighbourhood pharmacy"],[.7,-.45,["gold","acne","emulgel"],"Market pharmacy"],[-1.1,-.9,["gold","pro","emulgel","entry"],"Main road pharmacy"]];
+    shops=spots.map((s,i)=>({n:"Demo Chemist "+String.fromCharCode(65+i),a:s[3]+" (placed near you)",ll:off(me,s[0],s[1]),s:s[2]}));
+  }else{
+    const A=AREAS[area];
+    shops=A.shops.map(s=>({n:s[0],a:s[1],ll:off(A.c,s[2],s[3]),s:s[4]}));
+  }
+  const ref=me&&(nearMe||hav(me,AREAS[area].c)<40)?me:AREAS[area].c;
+  shops.forEach(s=>s.km=hav(ref,s.ll));
+  shops.sort((a,b)=>a.km-b.km);
+}
+
+function renderRec(){
+  const s=SKUS.find(x=>x.id===sku);
+  $("recName").textContent=s?s.full:"Photostable";
+  $("recWhy").textContent=s?s.why:"Pick your product to filter chemists";
+  $("tubeband").setAttribute("fill",s?s.col:"#F68B1F");
+  $("changeBtn").textContent=s?"Change":"Pick";
+}
+function renderFilters(){
+  const f=$("filters");f.innerHTML="";
+  [{id:"all",name:"All products"}].concat(SKUS).forEach(x=>{
+    const b=document.createElement("button");b.type="button";b.textContent=x.name;b.setAttribute("aria-pressed",x.id===sku);
+    b.onclick=()=>{sku=x.id;update();};f.appendChild(b);
+  });
+  const a=$("areas");a.innerHTML="";
+  Object.entries(AREAS).forEach(([k,v])=>{
+    const b=document.createElement("button");b.type="button";b.textContent=v.label;b.setAttribute("aria-pressed",!nearMe&&k===area);
+    b.onclick=()=>{area=k;nearMe=false;update(true);};a.appendChild(b);
+  });
+}
+function renderList(){
+  const L=$("list");L.innerHTML="";
+  const list=shops.filter(s=>sku==="all"||s.s.includes(sku));
+  const where=nearMe?"near you":"in "+AREAS[area].label;
+  const s=SKUS.find(x=>x.id===sku);
+  $("count").textContent=list.length+" chemist"+(list.length===1?"":"s")+" "+where+" usually stock "+(s?s.full:"Photostable");
+  const open=openNow();
+  list.forEach((sh,i)=>{
+    const d=document.createElement("div");d.className="shop"+(i===0?" best":"");
+    d.innerHTML='<div class="top"><div class="badge"></div><div><div class="nm"></div><div class="ad"></div></div><div class="dist"><b></b><small></small></div></div><div class="tagrow"></div><div class="acts"><button class="act p" type="button">Call</button><button class="act s" type="button">Directions</button></div>';
+    d.querySelector(".badge").textContent=i+1;
+    d.querySelector(".nm").textContent=sh.n;
+    d.querySelector(".ad").textContent=sh.a;
+    d.querySelector(".dist b").textContent=fmt(sh.km);
+    d.querySelector(".dist small").textContent=walk(sh.km);
+    const tr=d.querySelector(".tagrow");
+    const add=(c,t)=>{const e=document.createElement("span");e.className="chip "+c;e.textContent=t;tr.appendChild(e);};
+    if(i===0)add("best","Closest");
+    add(open?"open":"no",open?"Open now · till 10 pm":"Opens 9 am");
+    SKUS.forEach(x=>add((sh.s.includes(x.id)?"ok":"no")+(x.id===sku?" hl":""),(sh.s.includes(x.id)?"✓ ":"")+x.name));
+    const [c,r]=d.querySelectorAll(".act");
+    c.onclick=()=>toast("Demo: in the pilot this calls "+sh.n.replace("Demo ","the ")+" directly.");
+    r.onclick=()=>toast("Demo: in the pilot this opens Google Maps directions.");
+    L.appendChild(d);
+  });
+  const best=list[0];
+  $("stT").innerHTML="";$("stT").append("Nearest with "+(s?s.name:"Photostable"));
+  const b=document.createElement("b");b.textContent=best?best.n+" · "+fmt(best.km):"None nearby";$("stT").appendChild(b);
+  $("stCall").onclick=()=>toast(best?"Demo: in the pilot this calls "+best.n.replace("Demo ","the ")+".":"Try another area.");
+  return list;
+}
+let map,layer;
+function renderMap(list){
+  if(!window.L){$("map").style.display="none";return;}
+  if(!map){
+    map=L.map("map",{zoomControl:false,attributionControl:true,scrollWheelZoom:false});
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(map);
+    layer=L.layerGroup().addTo(map);map.attributionControl.setPrefix(false);
+  }
+  layer.clearLayers();const pts=[];
+  list.forEach((s,i)=>{
+    const ic=L.divIcon({className:"",html:'<div class="mk"><span>'+(i+1)+'</span></div>',iconSize:[28,28],iconAnchor:[14,28]});
+    L.marker(s.ll,{icon:ic}).addTo(layer).bindPopup(s.n.replace(/[<>&]/g,"")+"<br>"+fmt(s.km));pts.push(s.ll);
+  });
+  if(me&&(nearMe||hav(me,AREAS[area].c)<40)){L.marker(me,{icon:L.divIcon({className:"",html:'<div class="me"></div>',iconSize:[16,16],iconAnchor:[8,8]})}).addTo(layer);pts.push(me);}
+  if(pts.length)map.fitBounds(pts,{padding:[30,30],maxZoom:15});
+  setTimeout(()=>map.invalidateSize(),50);
+}
+function renderOnline(){
+  const s=SKUS.find(x=>x.id===sku);
+  const q=encodeURIComponent(s&&s.id!=="entry"?s.full.toLowerCase():"photostable");
+  const O=$("online");O.innerHTML="";
+  ONLINE.forEach(o=>{const a=document.createElement("a");a.href=o.u(q);a.target="_blank";a.rel="noopener";a.textContent=o.n;const sp=document.createElement("span");sp.textContent="Search "+(s?s.name:"all");a.appendChild(sp);O.appendChild(a);});
+}
+function update(rebuild){
+  if(rebuild!==false)buildShops();
+  renderRec();renderFilters();const list=renderList();renderMap(list);renderOnline();setPack(pack);
+  const np=new URLSearchParams();if(!nearMe)np.set("area",area);if(sku!=="all")np.set("sku",sku);
+  history.replaceState(null,"","?"+np.toString());
+}
+
+/* location */
+function setLoc(t,s,live){$("locT").textContent=t;$("locS").textContent=s;$("pin").classList.toggle("live",!!live);}
+function locate(){
+  if(!navigator.geolocation){setLoc("Location not available","Pick an area below");return;}
+  setLoc("Finding you…","Allow location access when asked",true);
+  navigator.geolocation.getCurrentPosition(p=>{
+    me=[p.coords.latitude,p.coords.longitude];
+    let best=null,bd=1e9;Object.entries(AREAS).forEach(([k,v])=>{const d=hav(me,v.c);if(d<bd){bd=d;best=k;}});
+    if(bd<40){area=best;nearMe=false;setLoc("Located in "+AREAS[best].label,"Sorted by distance from you",false);}
+    else{nearMe=true;setLoc("Located: outside the pilot areas","Demo chemists placed near you to show how it works",false);}
+    $("locBtn").textContent="Refresh";update(true);
+  },()=>{setLoc("Location not shared","Pick a pilot area below",false);},{enableHighAccuracy:true,timeout:9000,maximumAge:60000});
+}
+$("locBtn").onclick=locate;
+$("changeBtn").onclick=()=>{$("filters").scrollIntoView({behavior:"smooth",block:"center"});};
+if(navigator.permissions&&navigator.permissions.query){navigator.permissions.query({name:"geolocation"}).then(r=>{if(r.state==="granted")locate();}).catch(()=>{});}
+
+/* reminder */
+let pack="20";
+function setPack(p){
+  pack=p;
+  document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.p===p));
+  const day=p==="20"?12:30,pos=p==="20"?40:88;
+  $("rdot").style.left=pos+"%";$("rlbl").style.left=Math.min(pos,82)+"%";
+  $("rlbl").innerHTML="<b>Day "+day+"</b> reminder";
+  const slug=nearMe?"near-me":AREAS[area].slug;
+  $("sms").innerHTML='<small>SMS preview</small>';
+  $("sms").append("Photostable: your "+p+" g tube may be running low. Find it near you: ps.link/"+slug+". Reply STOP to opt out.");
+}
+document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>setPack(b.dataset.p));
+$("remind").onclick=()=>toast("Demo: in the pilot this opens a consent form (DPDP-compliant). Nothing is collected here.");
+
+update(true);
+</script>
+</body>
+</html>
