@@ -96,9 +96,12 @@ main{padding:0 16px}
 .act{border:none;border-radius:12px;padding:10px;font-weight:600;font-size:13.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
 .act.p{background:var(--orange);color:#fff}
 a.act{text-decoration:none}
-.dir{margin-top:12px;width:100%}
+.ind{margin-top:10px;font-size:12px;color:var(--burnt);font-weight:600;display:flex;align-items:center;gap:6px}
+.ind::before{content:"i";width:16px;height:16px;border-radius:50%;background:var(--peach);display:inline-grid;place-items:center;font-size:11px;font-weight:700;font-style:italic}
+.confirm{margin-top:8px;font-size:12px;color:var(--muted);text-align:center}
+.confirm b{color:var(--burnt)}
 .act.s{background:var(--peach2);color:var(--burnt)}
-.note{font-size:12.5px;color:var(--muted);background:var(--peach2);border-radius:12px;padding:10px 12px}
+.note{font-size:11.5px;color:var(--muted);text-align:center;padding:2px 8px}
 
 /* online */
 .online{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
@@ -185,7 +188,7 @@ footer{font-size:11.5px;color:var(--muted);text-align:center;padding:26px 20px 1
       <div class="filters" id="filters" role="group" aria-label="Filter by product"></div>
       <div class="count" id="count"></div>
       <div id="list"></div>
-      <div class="note">Stock shows what each chemist <b>usually</b> carries, refreshed weekly from distributor data. Call before you go; any chemist can also order it for you within a day.</div>
+      <div class="note">Stock is indicative, based on what each chemist usually carries. Any chemist can also order it for you within a day.</div>
     </div>
 
     <div class="sec">
@@ -255,19 +258,12 @@ const SKUS=[
 ];
 // Pilot clusters (illustrative chemists placed around each centre; offsets in km east/north)
 const AREAS={
-  delhi:{label:"Delhi NCR",c:[28.6519,77.1909],slug:"delhi",shops:[
-    ["Demo Chemist 1","Karol Bagh, next to skin clinic",.15,.1,["gold","acne","pro","emulgel","entry"]],
-    ["Demo Chemist 2","Pusa Road",-.5,.35,["gold","acne","pro","emulgel"]],
-    ["Demo Chemist 3","Patel Nagar",-1.1,.6,["gold","acne","emulgel","entry"]],
-    ["Demo Chemist 4","Rajendra Place",.9,-.8,["gold","acne"]]]},
-  agra:{label:"Agra",c:[27.1991,78.0055],slug:"agra",shops:[
-    ["Demo Chemist 5","Sanjay Place, near clinic",.1,.05,["gold","acne","pro","emulgel","entry"]],
-    ["Demo Chemist 6","Hari Parwat",.6,-.4,["gold","acne","pro","entry"]],
-    ["Demo Chemist 7","Civil Lines",-.9,.8,["gold","emulgel"]]]},
-  punjab:{label:"Punjab (Batala)",c:[31.8186,75.2028],slug:"batala",shops:[
-    ["Demo Chemist 8","Near civil hospital",.2,.15,["gold","acne","pro","emulgel","entry"]],
-    ["Demo Chemist 9","Main bazaar",-.6,.4,["gold","acne","entry"]],
-    ["Demo Chemist 10","Gurdaspur Road",1.4,1.1,["gold","pro","emulgel"]]]}
+  mumbai:{label:"Andheri, Mumbai",c:[19.1364,72.8296],slug:"andheri",shops:[
+    ["Demo Chemist 1","Andheri West, next to skin clinic",.12,.08,["gold","acne","pro","emulgel","entry"]],
+    ["Demo Chemist 2","Veera Desai Road",-.35,.45,["gold","acne","pro","entry"]],
+    ["Demo Chemist 3","Azad Nagar, near metro",.7,-.35,["gold","acne","emulgel"]],
+    ["Demo Chemist 4","Lokhandwala Complex",-1.3,.9,["gold","acne","pro","emulgel","entry"]],
+    ["Demo Chemist 5","Andheri station (East)",1.6,-.2,["gold","pro","emulgel"]]]}
 };
 const ONLINE=[
   {n:"Tata 1mg",u:q=>"https://www.1mg.com/search/all?name="+q},
@@ -279,7 +275,7 @@ const HOURS=[[9,0],[22,0]];
 const $=id=>document.getElementById(id);
 const P=new URLSearchParams(location.search);
 let sku=SKUS.some(s=>s.id===P.get("sku"))?P.get("sku"):"all";
-let area=AREAS[P.get("area")]?P.get("area"):"delhi";
+let area="mumbai"; // demo always shows Andheri, Mumbai
 let me=null;           // demo "you are here" point, set in buildShops
 let nearMe=false;      // demo chemists generated around the user
 let shops=[];
@@ -314,7 +310,7 @@ function renderRec(){
   img.onload=()=>{img.hidden=false;tube.style.display="none";};
   img.onerror=()=>{img.hidden=true;tube.style.display="";};
   img.alt=s?s.full+" pack":"Photostable pack";
-  img.src="assets/photostable-"+(id==="entry"?"gold":id)+".png";
+  img.src="assets/photostable-gold.png"; // demo: one real pack photo for every product
 }
 function renderFilters(){
   const f=$("filters");f.innerHTML="";
@@ -332,7 +328,7 @@ function renderList(){
   const open=openNow();
   list.forEach((sh,i)=>{
     const d=document.createElement("div");d.className="shop"+(i===0?" best":"");
-    d.innerHTML='<div class="top"><div class="badge"></div><div><div class="nm"></div><div class="ad"></div></div><div class="dist"><b></b><small></small></div></div><div class="tagrow"></div><a class="act p dir" target="_blank" rel="noopener">Get directions</a>';
+    d.innerHTML='<div class="top"><div class="badge"></div><div><div class="nm"></div><div class="ad"></div></div><div class="dist"><b></b><small></small></div></div><div class="tagrow"></div><div class="acts"><button class="act p call" type="button" aria-expanded="false"><svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg>Call</button><a class="act s dir" target="_blank" rel="noopener">Directions</a></div><div class="confirm" hidden>Demo · in the pilot, this dials the chemist to confirm stock.</div>';
     d.querySelector(".badge").textContent=i+1;
     d.querySelector(".nm").textContent=sh.n;
     d.querySelector(".ad").textContent=sh.a;
@@ -344,6 +340,8 @@ function renderList(){
     add(open?"open":"no",open?"Open now · till 10 pm":"Opens 9 am");
     SKUS.forEach(x=>add((sh.s.includes(x.id)?"ok":"no")+(x.id===sku?" hl":""),(sh.s.includes(x.id)?"✓ ":"")+x.name));
     d.querySelector(".dir").href=dirUrl(sh.ll);
+    const cb=d.querySelector(".call"),cf=d.querySelector(".confirm");
+    cb.onclick=()=>{const o=cf.hidden;cf.hidden=!o;cb.setAttribute("aria-expanded",o);};
     L.appendChild(d);
   });
   const best=list[0];
@@ -378,7 +376,7 @@ function renderOnline(){
 function update(rebuild){
   if(rebuild!==false)buildShops();
   renderRec();renderFilters();const list=renderList();renderMap(list);renderOnline();setPack(pack);
-  const np=new URLSearchParams();if(!nearMe)np.set("area",area);if(sku!=="all")np.set("sku",sku);
+  const np=new URLSearchParams();if(sku!=="all")np.set("sku",sku);
   history.replaceState(null,"","?"+np.toString());
 }
 
