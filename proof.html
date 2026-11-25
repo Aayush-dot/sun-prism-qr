@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F68B1F">
+<meta name="robots" content="noindex">
+<title>Photostable Proof (Concept Demo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Lora:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--orange:#F68B1F;--orange2:#FF9F3F;--gold:#E9B437;--burnt:#C55A11;--peach:#FCE4D6;--peach2:#FFF4EC;--ink:#1F2328;--muted:#636A72;--line:#EEE6DF;--bg:#FAF6F2;--card:#fff;--green:#1F8A4C;--greenbg:#E6F4EC;--shadow:0 6px 20px rgba(197,90,17,.10),0 1px 3px rgba(0,0,0,.05)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 "Poppins",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;padding-bottom:calc(28px + env(safe-area-inset-bottom))}
+.wrap{max-width:520px;margin:0 auto}
+.demo{background:#2B2B2B;color:#fff;font-size:11px;text-align:center;padding:6px 14px;line-height:1.4}
+.hero{background:linear-gradient(160deg,var(--orange) 0%,var(--orange2) 55%,var(--gold) 100%);color:#fff;padding:14px 16px 96px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-70px;top:-70px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.35),rgba(255,255,255,0) 70%)}
+.row{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1}
+.back{color:#fff;text-decoration:none;font-size:22px;line-height:1;width:36px;height:36px;display:grid;place-items:center;border-radius:50%;background:rgba(255,255,255,.18)}
+.logo{background:#fff;border-radius:12px;padding:6px 8px;box-shadow:0 4px 12px rgba(0,0,0,.12);line-height:0}
+.logo img{height:42px;width:auto;display:block}
+.hero .k{position:relative;z-index:1;margin-top:14px;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;opacity:.95}
+.card{background:var(--card);border-radius:22px;box-shadow:var(--shadow);margin:-84px 16px 0;padding:20px 18px 18px;position:relative;z-index:2}
+.top{display:flex;gap:14px;align-items:center}
+.top img{width:74px;height:96px;object-fit:contain;flex:none}
+.title{font-family:"Lora",Georgia,serif;font-weight:600;font-size:27px;line-height:1.1;margin:0}
+.sub{font-size:12.5px;color:var(--muted);margin-top:4px}
+.badge{display:inline-flex;align-items:center;gap:6px;margin-top:8px;background:var(--greenbg);color:var(--green);font-weight:700;font-size:12px;border-radius:99px;padding:4px 10px}
+.checks{list-style:none;margin:18px 0 4px;padding:0}
+.checks li{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);opacity:0;transform:translateY(6px);animation:in .45s ease-out forwards}
+.checks li:last-child{border-bottom:none}
+.checks li:nth-child(1){animation-delay:.15s}.checks li:nth-child(2){animation-delay:.35s}.checks li:nth-child(3){animation-delay:.55s}.checks li:nth-child(4){animation-delay:.75s}
+@keyframes in{to{opacity:1;transform:none}}
+.seal{width:30px;height:30px;flex:none}
+.checks b{display:block;font-size:15px;font-weight:600}
+.checks span{font-size:12.5px;color:var(--muted)}
+.spf{margin-top:14px;background:var(--peach2);border-radius:16px;padding:14px}
+.spf .h{display:flex;justify-content:space-between;align-items:baseline}
+.spf .h b{font-size:14px}
+.spf .h em{font-style:normal;font-weight:800;color:var(--green);font-size:20px}
+.bar{margin-top:8px}
+.bar .l{display:flex;justify-content:space-between;font-size:12px;font-weight:600;color:var(--muted)}
+.bar .t{height:10px;border-radius:10px;background:#EFE6DD;overflow:hidden;margin-top:3px}
+.bar .f{height:100%;width:0;border-radius:10px;transition:width 1.1s ease-out}
+.f.lab{background:#C9BFB6}.f.got{background:linear-gradient(90deg,#43B57A,var(--green))}
+.ill{font-size:11px;color:var(--muted);margin-top:8px}
+.cta{display:block;text-align:center;text-decoration:none;font-weight:700;font-size:16px;border-radius:99px;padding:14px;margin-top:16px}
+.cta.p{background:linear-gradient(90deg,var(--orange),var(--gold));color:#fff;box-shadow:0 6px 16px rgba(246,139,31,.35)}
+.cta.s{background:var(--peach2);color:var(--burnt);font-size:14.5px;margin-top:10px}
+main{padding:0 16px}
+.sec{margin-top:22px}
+.sec h3{font-size:16px;margin:0 0 10px;font-weight:700}
+.filters{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:6px 14px}
+.f1{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}
+.f1:last-child{border-bottom:none}
+.f1 .d{width:10px;height:10px;border-radius:50%;background:var(--orange);margin-top:6px;flex:none}
+.f1 b{font-size:14px}
+.f1 span{display:block;font-size:12.5px;color:var(--muted)}
+.new{display:inline-block;font-size:10.5px;font-weight:700;color:#fff;background:var(--burnt);border-radius:99px;padding:1px 7px;margin-left:6px;vertical-align:2px}
+.why{background:var(--peach);border-radius:16px;padding:14px 16px;font-size:13.5px}
+.why b{color:var(--burnt)}
+footer{font-size:11.5px;color:var(--muted);text-align:center;padding:24px 20px 6px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="demo">Concept demo · Sun Prism case competition · Team Rajma Chawal, SPJIMR · Not an official Sun Pharma page · Illustrative test values</div>
+
+<section class="hero"><div class="wrap">
+  <div class="row">
+    <a class="back" href="./" aria-label="Back to Photostable">&#8592;</a>
+    <div class="logo"><img src="assets/sun-pharma-logo.png" alt="Sun Pharma" width="45" height="60"></div>
+  </div>
+  <div class="k">Photostable Proof · Scan result</div>
+</div></section>
+
+<div class="wrap">
+  <div class="card">
+    <div class="top">
+      <img src="assets/photostable-gold.png" alt="Photostable Gold pack" width="249" height="327">
+      <div>
+        <h1 class="title">Photostable Gold</h1>
+        <div class="sub">Matte Finish Sunscreen Gel · SPF 55<br>Batch PSG-2602 (demo)</div>
+        <div class="badge"><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="#1F8A4C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Genuine pack</div>
+      </div>
+    </div>
+
+    <ul class="checks">
+      <li><svg class="seal" viewBox="0 0 32 32" aria-hidden="true"><path fill="#2E9E5B" d="M16 1.5l3.2 2.6 4.1-.5 1.6 3.8 3.8 1.6-.5 4.1 2.6 3.2-2.6 3.2.5 4.1-3.8 1.6-1.6 3.8-4.1-.5L16 30.5l-3.2-2.6-4.1.5-1.6-3.8-3.8-1.6.5-4.1L1.2 16l2.6-3.2-.5-4.1 3.8-1.6 1.6-3.8 4.1.5z"/><path d="M10 16.5l4 4 8-8.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><div><b>Authenticity verified</b><span>This pack is a genuine Photostable Gold</span></div></li>
+      <li><svg class="seal" viewBox="0 0 32 32" aria-hidden="true"><path fill="#2E9E5B" d="M16 1.5l3.2 2.6 4.1-.5 1.6 3.8 3.8 1.6-.5 4.1 2.6 3.2-2.6 3.2.5 4.1-3.8 1.6-1.6 3.8-4.1-.5L16 30.5l-3.2-2.6-4.1.5-1.6-3.8-3.8-1.6.5-4.1L1.2 16l2.6-3.2-.5-4.1 3.8-1.6 1.6-3.8 4.1.5z"/><path d="M10 16.5l4 4 8-8.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><div><b>In-vivo SPF verified</b><span>Tested on skin under BIS IS 17494:2025</span></div></li>
+      <li><svg class="seal" viewBox="0 0 32 32" aria-hidden="true"><path fill="#2E9E5B" d="M16 1.5l3.2 2.6 4.1-.5 1.6 3.8 3.8 1.6-.5 4.1 2.6 3.2-2.6 3.2.5 4.1-3.8 1.6-1.6 3.8-4.1-.5L16 30.5l-3.2-2.6-4.1.5-1.6-3.8-3.8-1.6.5-4.1L1.2 16l2.6-3.2-.5-4.1 3.8-1.6 1.6-3.8 4.1.5z"/><path d="M10 16.5l4 4 8-8.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><div><b>Dermatologically tested</b><span>Non-comedogenic and non-irritant</span></div></li>
+      <li><svg class="seal" viewBox="0 0 32 32" aria-hidden="true"><path fill="#2E9E5B" d="M16 1.5l3.2 2.6 4.1-.5 1.6 3.8 3.8 1.6-.5 4.1 2.6 3.2-2.6 3.2.5 4.1-3.8 1.6-1.6 3.8-4.1-.5L16 30.5l-3.2-2.6-4.1.5-1.6-3.8-3.8-1.6.5-4.1L1.2 16l2.6-3.2-.5-4.1 3.8-1.6 1.6-3.8 4.1.5z"/><path d="M10 16.5l4 4 8-8.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><div><b>Batch quality approved</b><span>Batch PSG-2602 passed release checks</span></div></li>
+    </ul>
+
+    <div class="spf">
+      <div class="h"><b>Tested SPF vs label</b><em>SPF 58</em></div>
+      <div class="bar"><div class="l"><span>Label claim</span><span>SPF 55</span></div><div class="t"><div class="f lab" data-w="78"></div></div></div>
+      <div class="bar"><div class="l"><span>Tested on skin (in-vivo)</span><span style="color:var(--green)">SPF 58</span></div><div class="t"><div class="f got" data-w="82"></div></div></div>
+      <div class="ill">Illustrative values for this concept demo</div>
+    </div>
+
+    <a class="cta p" href="report.html">View full test report</a>
+    <a class="cta s" href="./?sku=gold">Find it in stock near you</a>
+  </div>
+
+  <main>
+    <div class="sec">
+      <h3>The filters inside</h3>
+      <div class="filters">
+        <div class="f1"><div class="d"></div><div><b>Tinosorb S (bemotrizinol)</b><span class="new">US FDA 2026</span><span>Broad UVA + UVB. The US approved it in June 2026, its first new sunscreen filter in decades.</span></div></div>
+        <div class="f1"><div class="d"></div><div><b>Tinosorb M</b><span>Broad-spectrum protection that stays stable in sunlight.</span></div></div>
+        <div class="f1"><div class="d"></div><div><b>Uvinul A Plus</b><span>Long-wave UVA, the rays linked to tanning and pigmentation.</span></div></div>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="why"><b>Why we show this:</b> in 2025 an independent test found that 5–6 of 10 popular sunscreens delivered less than half their claimed SPF. Photostable shows you the result behind the pack in your hand.</div>
+    </div>
+  </main>
+
+  <footer>Concept demo by Team Rajma Chawal (SPJIMR) for Sun Pharma's Sun Prism Season 2 case competition. Test values, batch and dates are illustrative; in the pilot each pack links to its real, published result. Photostable is a brand of Sun Pharmaceutical Industries Ltd.</footer>
+</div>
+<script>
+requestAnimationFrame(()=>setTimeout(()=>document.querySelectorAll(".bar .f").forEach(f=>f.style.width=f.dataset.w+"%"),700));
+</script>
+</body>
+</html>

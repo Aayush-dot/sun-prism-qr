@@ -12,3 +12,8 @@ Concept demo for Sun Pharma's Sun Prism Season 2 case competition (Team Rajma Ch
 
 ## Pack photo
 - `assets/photostable-gold.png` is shown for every product in this demo.
+
+## Proof pages
+- `proof.html` → the scan result (use this link for the QR on the box and tube).
+- `report.html` → the full test report ("View full test report"); "Download PDF" prints it.
+- All test values are illustrative.
